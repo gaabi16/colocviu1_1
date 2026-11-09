@@ -1,5 +1,6 @@
 package ro.pub.cs.systems.eim.colocviu1_1
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -7,6 +8,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -19,7 +21,18 @@ class Colocviu1_1MainActivity : AppCompatActivity() {
     private lateinit var southButton: Button
     private lateinit var instructionsText: EditText
 
+    private lateinit var navigateButton: Button
+
     private var buttonCount = 0
+
+    private val secondaryLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == RESULT_OK) {
+            val registered = result.data?.getStringExtra(Constants.INSTRUCTIONS) ?: ""
+            Toast.makeText(this, "Inregistrat $registered", Toast.LENGTH_LONG).show()
+            } else {
+            Toast.makeText(this, "Anulat", Toast.LENGTH_SHORT).show()
+        }
+    }
 
     private val dirListener = View.OnClickListener { view ->
         val direction = (view as Button).text.toString()
@@ -59,6 +72,14 @@ class Colocviu1_1MainActivity : AppCompatActivity() {
         eastButton.setOnClickListener(dirListener)
         westButton.setOnClickListener(dirListener)
         southButton.setOnClickListener(dirListener)
+
+        navigateButton = findViewById(R.id.navigate_button)
+
+        navigateButton.setOnClickListener {
+            val intent = Intent(this, Colocviu1_1SecondaryActivity::class.java)
+            intent.putExtra(Constants.INSTRUCTIONS, instructionsText.text.toString())
+            secondaryLauncher.launch(intent)
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
