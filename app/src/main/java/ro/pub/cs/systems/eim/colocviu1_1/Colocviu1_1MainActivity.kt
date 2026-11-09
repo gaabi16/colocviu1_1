@@ -36,7 +36,6 @@ class Colocviu1_1MainActivity : AppCompatActivity() {
 
     private val dirListener = View.OnClickListener { view ->
         val direction = (view as Button).text.toString()
-        instructionsText = findViewById(R.id.instructions_text)
         val current = instructionsText.text.toString()
 
         var textNou = ""
@@ -51,6 +50,12 @@ class Colocviu1_1MainActivity : AppCompatActivity() {
         buttonCount++
 
         Log.d(Constants.TAG, "S-au apasat: $buttonCount")
+
+        if (buttonCount >= 4) {
+            val serviceIntent = Intent(this, Colocviu1_1Service::class.java)
+            serviceIntent.putExtra(Constants.INSTRUCTIONS, textNou)
+            startService(serviceIntent)
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -67,6 +72,7 @@ class Colocviu1_1MainActivity : AppCompatActivity() {
         eastButton = findViewById(R.id.east_button)
         westButton = findViewById(R.id.west_button)
         southButton = findViewById(R.id.south_button)
+        instructionsText = findViewById(R.id.instructions_text)
 
         northButton.setOnClickListener(dirListener)
         eastButton.setOnClickListener(dirListener)
@@ -93,5 +99,11 @@ class Colocviu1_1MainActivity : AppCompatActivity() {
         Toast.makeText(this, "S-au apasat: $buttonCount", Toast.LENGTH_SHORT).show()
         Log.d(Constants.TAG, "S-au apasat: $buttonCount")
     }
+
+    override fun onDestroy() {
+        stopService(Intent(this, Colocviu1_1Service::class.java))
+        super.onDestroy()
+    }
+
 
 }
